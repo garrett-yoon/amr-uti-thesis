@@ -123,3 +123,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+data/SHA256SUMS.txt
+data/LICENSE.txt
+data/data_dictionary.csv
+data/all_uti_resist_labels.csv
+data/all_uti_features.csv
+data/all_prescriptions.csv
