@@ -128,3 +128,5 @@ data/all_prescriptions.csv
 data/all_uti_features.csv
 data/all_uti_resist_labels.csv
 data/data_dictionary.csv
+nudge_clinical.png
+supp_material_amr_uti.pdf
