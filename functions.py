@@ -282,3 +282,4 @@ def iat_broad_plot_age(dfs, time):
     plt.title("IAT vs % Broad Spectrum Use Conditional on Age Subgroup", size='x-large')
     plt.legend(labels=['18-27', '27-39', '>39'])
     plt.savefig(f"{time}/{time}" + "_iat_broad_age.png", dpi=300)
+    
