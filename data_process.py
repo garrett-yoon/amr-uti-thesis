@@ -1,14 +1,5 @@
-import numpy as np
 import pandas as pd
-import seaborn as sns
-import sklearn
-from sklearn.metrics import roc_curve
-from statsmodels.distributions.empirical_distribution import ECDF
-import warnings
-import itertools
 import pathlib
-import os
-from datetime import datetime
 
 
 def load_data(file_name):
@@ -67,10 +58,19 @@ def get_test_policy_df():
     return test_policy_opt
 
 
+def add_prescription(df):
+    prescript = load_data('all_prescriptions.csv').drop(columns=['is_train'])
+    return df.merge(prescript, how='left', on='example_id')
+
+
+def add_labels(df):
+    labels = load_data('all_uti_resist_labels.csv').drop(columns=['is_train', 'uncomplicated'])
+    return df.merge(labels, how='left', on='example_id')
+
+
 def add_race(df):
     df['race'] = df['demographics - is_white'].replace(to_replace=[0, 1],
-                                                       value=['non-white', 'white'],
-                                                       inplace=True)
+                                                       value=['non-white', 'white'])
     return df
 
 
@@ -89,13 +89,34 @@ def age_group(x):
 def add_age(df):
     df['age'] = df['demographics - age']
     df['age_group'] = df.apply(age_group, axis=1)
-
     return df
 
 
-def get_id_race_age(df):
-    features = get_features_df()
-    id_race = features[['example_id', 'demographics - is_white', 'age_group', 'race']].rename(
-        columns={"demographics - is_white": "white"})
+def add_race_age(df):
+    features = add_age(add_race(get_features_df()))
+    id_race = features[['example_id', 'race', 'age_group']]
     return df.merge(id_race, on='example_id', how='left')
+
+
+def get_train_test(df):
+    train_df = df.query('is_train == 1')
+    test_df = df.query('is_train == 0')
+
+    return train_df, test_df
+
+
+def get_white_data(df):
+    return df.query('race == "white"')
+
+
+def get_nonwhite_data(df):
+    return df.query('race == "non-white"')
+
+
+def get_age_groups(df):
+    young = df.query('age_group == 0')
+    mid = df.query('age_group == 1')
+    old = df.query('age_group == 2')
+    return young, mid, old
+
 

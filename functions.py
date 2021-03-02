@@ -16,20 +16,6 @@ import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
 
 
-
-
-# Create age groups using pandas apply
-def age_group(x):
-    q1 = 27.0
-    q2 = 40.0
-    
-    if x.age <= q1:
-        return 0
-    elif x.age <= q2:
-        return 1
-    else:
-        return 2
-
 # Creates binary labels for whether the sample passes the threshold for each abx
 def create_binary_suscept(df, thresholds):
     abxs = ['NIT', 'SXT', 'CIP', 'LVX']
@@ -41,6 +27,7 @@ def create_binary_suscept(df, thresholds):
         new_df[new] = (new_df[var] > t_val).astype(int)
     return new_df
 
+
 # Recommends the most narrow antibiotic pt is susceptible to
 def create_recomendation(row):
     abxs = ['NIT', 'SXT', 'CIP', 'LVX']
@@ -49,6 +36,7 @@ def create_recomendation(row):
         if row[lab] == 0:
             return abx
     return 'defer'
+
 
 # Recommends the most narrow antibiotic pt is susceptible to
 # If defer, recommends actual prescription given
@@ -59,6 +47,7 @@ def create_recomendation_final(row):
         if row[lab] == 0:
             return abx
     return row.prescription
+
 
 # Returns 1 if patient is resistant to rec abx
 def iat(row):
@@ -147,41 +136,16 @@ def plot_ecdf_thresholds(data_list,
 
 
 # Splits by race, and makes recommendations + labels IAT/Broad
-def create_rec_df_race(df, thresholds):
-    test_predictions_a = df.query('is_train == 0')
-    test_predictions_w = df.query('white == 1').query('is_train == 0')
-    test_predictions_nw = df.query('white == 0').query('is_train == 0')
+def create_rec_dfs(dfs, thresholds):
 
-    for df in [test_predictions_a, test_predictions_w, test_predictions_nw]:
+    for df in dfs:
         df = create_binary_suscept(df, thresholds)
         df['rec'] = df.apply(create_recomendation, axis = 1) 
         df['rec_final'] = df.apply(create_recomendation_final, axis = 1)
         df['iat'] = df.apply(iat, axis = 1)
         df['broad_abx'] = df.apply(broad_abx, axis = 1)
     
-    return test_predictions_a, test_predictions_w, test_predictions_nw
-
-# Splits by age, and makes recs + labels IAT/Broad
-def create_rec_df_age(df, thresholds):
-    
-    # By age group analysis
-
-    test_predictions_a = df.query('is_train == 0')
-    test_predictions_young = df.query('age_group == 0').query('is_train == 0')
-    test_predictions_mid = df.query('age_group == 1').query('is_train == 0')
-    test_predictions_old = df.query('age_group == 2').query('is_train == 0')
-
-    # Label train and validation dataframes with variables for whether
-    # sample is non-susceptible to an antibiotic based on optimal thresholds
-
-    for df in [test_predictions_a, test_predictions_young, test_predictions_mid, test_predictions_old]:
-        df = create_binary_suscept(df, thresholds)
-        df['rec'] = df.apply(create_recomendation, axis = 1) 
-        df['rec_final'] = df.apply(create_recomendation_final, axis = 1)
-        df['iat'] = df.apply(iat, axis = 1)
-        df['broad_abx'] = df.apply(broad_abx, axis = 1)
-    
-    return test_predictions_a, test_predictions_young, test_predictions_mid, test_predictions_old
+    return dfs
 
 
 # Calculate IAT and Broad Rate by Race
