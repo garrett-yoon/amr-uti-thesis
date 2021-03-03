@@ -17,6 +17,7 @@ import matplotlib.pyplot as plt
 
 from functions import *
 from data_process import *
+from figures import *
 
 warnings.filterwarnings('ignore')
 
@@ -84,10 +85,10 @@ if __name__ == '__main__':
                          thresholds)
 
     # IAT/Broad rate calculations
-    iat_broad_rate_csv(dfs_race,
+    iat_broad_rate_race_csv(dfs_race,
                        dtime)
 
-    iat_broad_rate_age(dfs_age,
+    iat_broad_rate_age_csv(dfs_age,
                        dtime)
 
     # Flowchart numbers
