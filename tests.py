@@ -1,6 +1,7 @@
 import unittest
-import pandas as pd
+
 from pandas.testing import assert_frame_equal, assert_series_equal
+
 from data_process import *
 from functions import *
 
@@ -56,7 +57,3 @@ class TestFunctions(unittest.TestCase):
                                'nonsusceptible_LVX': [1],
                                'prescription': 'SXT'})
         assert_series_equal(labels.apply(create_recomendation_final, axis=1), pd.Series(['SXT']))
-
-
-
-

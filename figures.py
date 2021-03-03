@@ -1,16 +1,17 @@
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
+from statsmodels.distributions.empirical_distribution import ECDF
 from functions import get_iat_broad
 
 
 # Create ECDF Plots
-def plot_ecdf_thresholds(data_list,
+def plot_ecdf_thresholds(dfs,
                          labels,
                          split_s,
                          time,
                          thresholds):
     abxs = ['NIT', 'SXT', 'CIP', 'LVX']
-    data_list = data_list.copy()
+    data_list = dfs.copy()
     fig, ax = plt.subplots(2, 2, figsize=(20, 10))
     axes = [ax for ax in fig.axes]
     tup = zip(abxs, axes)
@@ -106,3 +107,5 @@ def iat_broad_plot_age(dfs, time):
     plt.title("IAT vs % Broad Spectrum Use Conditional on Age Subgroup", size='x-large')
     plt.legend(labels=['18-27', '27-39', '>39'])
     plt.savefig(f"{time}/{time}" + "_iat_broad_age.png", dpi=300)
+
+#

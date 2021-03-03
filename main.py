@@ -86,10 +86,10 @@ if __name__ == '__main__':
 
     # IAT/Broad rate calculations
     iat_broad_rate_race_csv(dfs_race,
-                       dtime)
+                            dtime)
 
     iat_broad_rate_age_csv(dfs_age,
-                       dtime)
+                           dtime)
 
     # Flowchart numbers
     general_make_counts(dfs_race,
