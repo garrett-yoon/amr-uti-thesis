@@ -4,6 +4,7 @@ from pandas.testing import assert_frame_equal, assert_series_equal
 
 from data_process import *
 from functions import *
+from figures import *
 
 
 class TestDataProcess(unittest.TestCase):
@@ -23,6 +24,9 @@ class TestDataProcess(unittest.TestCase):
     def test_white_nonwhite(self):
         self.assertEqual(get_white_data(add_race_age(get_test_predictions())).shape[0], 10054)
         self.assertEqual(get_nonwhite_data(add_race_age(get_test_predictions())).shape[0], 5752)
+
+    def test_val_preds(self):
+        self.assertEqual(get_val_preds().shape[0], 11865 * 20)
 
 
 class TestFunctions(unittest.TestCase):
@@ -57,3 +61,5 @@ class TestFunctions(unittest.TestCase):
                                'nonsusceptible_LVX': [1],
                                'prescription': 'SXT'})
         assert_series_equal(labels.apply(create_recomendation_final, axis=1), pd.Series(['SXT']))
+
+

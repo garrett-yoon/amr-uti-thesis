@@ -87,15 +87,26 @@ def make_fig_fold():
 
 
 # Splits by race, and makes recommendations + labels IAT/Broad
-def create_rec_dfs(dfs, thresholds):
+def create_rec_dfs(df, thresholds):
+    out = df.copy()
+    out = create_binary_nonsuscept(out, thresholds)
+    out['rec'] = out.apply(create_recomendation, axis=1)
+    out['rec_final'] = out.apply(create_recomendation_final, axis=1)
+    out['iat'] = out.apply(iat, axis=1)
+    out['broad_abx'] = out.apply(broad_abx, axis=1)
+
+    return out
+
+
+# Creates recs by group, returns an array of the dataframes
+def create_rec_by_group(dfs, groups, thresholds):
     out = []
-    for df in dfs:
-        df = create_binary_nonsuscept(df, thresholds)
-        df['rec'] = df.apply(create_recomendation, axis=1)
-        df['rec_final'] = df.apply(create_recomendation_final, axis=1)
-        df['iat'] = df.apply(iat, axis=1)
-        df['broad_abx'] = df.apply(broad_abx, axis=1)
-        out.append(df)
+    if groups is None:
+        for df in dfs:
+            out.append(create_rec_dfs(df, thresholds))
+    else:
+        for df, g in zip(dfs, groups):
+            out.append(create_rec_dfs(df, thresholds[g]))
 
     return out
 
