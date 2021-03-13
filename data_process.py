@@ -8,6 +8,11 @@ def load_data(file_name):
     return pd.read_csv(data_path / file_name)
 
 
+def load_data_from_path(file_name, path):
+    data_path = pathlib.Path(path)
+    return pd.read_csv(data_path / file_name)
+
+
 # Return the dataframe with all patient features
 def get_features_df():
 
