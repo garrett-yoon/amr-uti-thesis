@@ -123,7 +123,7 @@ def get_stats_for_train_val_preds(train_preds, val_preds, curr_setting, contra_d
         return res, thresholds
 
 
-def get_policy_with_contraindications(row, thresholds, contra_dict, abx_list=['NIT', 'SXT', 'CIP', 'LVX']):
+def get_policy_with_contraindications(row, thresholds, contra_dict, abx_list = ['NIT', 'SXT', 'CIP', 'LVX']):
 
     for abx in abx_list:
         if row[f'predicted_prob_{abx}'] < thresholds[abx] and row['example_id'] not in contra_dict[abx]:

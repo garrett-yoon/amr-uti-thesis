@@ -68,7 +68,7 @@ if __name__ == '__main__':
     dfs_age = [allpt, youngpt, midpt, oldpt]
 
     # Make the directory for figure/csv outputs
-    dtime = make_fig_fold()
+    dtime = make_fig_fold('_main')
 
     thresholds_df = pd.DataFrame(thresholds, index=['Thresholds'])
     thresholds_df.to_csv(f"{dtime}/{dtime}_thresholds_used.csv")

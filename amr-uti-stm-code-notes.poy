@@ -1,0 +1,82 @@
+# amr-uti-stm code breakdown
+
+# Run scripts
+
+
+* run_all_rep.sh
+    * Builds outcome models using original HP
+    * Runs train_outcome_models_eval_test_replication.sh
+* run_all.sh
+    * Full end to end analysis including building outcome models, thresholding, and re-training models, thresholding on test set.
+    * Runs train_outcome_models_validation.sh
+    * Runs thresholding_validation.sh
+    Runs train_outcome_models_eval_test.sh
+    Runs thresholding_test.sh
+
+# .py scripts
+
+* experiments
+    * experiment_thresholding.py
+        * IF RUN BY thresholding_validation.sh
+        * Creates FNR combos for antibiotics
+            * Calculates stats for all threshold combinations, stores in val_stats_by_setting.csv
+                * iat_prop/broad_prop : mean IAT/Broad proportion over 20 cross validation sets (all samples)
+                * iat_prop_decision/broad_prop_decision : mean IAT/Broad proportion over 20 cross validation sets (decision cohort)
+                * iat_diff_mean/broad_diff_mean : mean IAT/broad difference rate from physician prescriptions * number of samples = mean number of samples difference that were IAT or 2nd line compared to actual prescriptions
+                * iat_diff_std/broad_diff_std : std dev of IAT/broad difference rate from physician prescriptions * number of samples = st dev of samples difference that were IAT or 2nd line compared to actual prescriptions
+                * defer_rate: mean rate of deferral (no recommendation made)
+            * Calculates best outcomes for each 2nd line usage constraint, stores in best_val_outcomes_by_max_broad.csv
+            * Generates 50 difference broad spectrum constraints between 1% and 50%
+            * Finds where IAT_prop is lowest given broad_prop < constraint
+        * IF RUN BY thresholding_test.sh
+            * Broad constraint is set at 10%, selects a threshold set (minimal IAT)
+            * Loads in best_val_outcomes_by_max_broad.csv
+            * Evaluates the chosen set of thresholds on the test set, creating a best_test_outcomes_by_max_broad.csv
+            * One line is the set of stats
+            * Creates a test_policy_df, which has each samples predicted probabilities,true labels, prescription, algorithm recommendation (NIT, SVX, CIP, LVX, defer), and final recommendation
+    * experiment_train_outcome_models.py
+        * IF RUN BY train_outcome_models_validation.sh
+            * (Only used in end to end analysis)
+            * Stores results in train_outcome_models/train_outcome_models_eval_test(_rep)/results
+            * Tunes hyperparameters for models to predict resistance to abx drug_code
+            * Trains models to predict resistance to antibiotic drug_code at the best hyperparameters setting chosen from the validation set for each model class. Returns dictionary model mapping class to validation AUC for the class.
+            * Find best model for each abx based on validation AUC
+            * Creates hyperparameters.json, val_aucs.json in results path
+            * Creates best_models.json
+            * Generates predicted probabilities of resistance for multiple train/validation splits across all antibiotics using the optimal tune hyperparameters and model classes
+            * Creates val_predictions.csv in results path
+        * IF RUN BY train_outcome_models_eval_test_replication.sh or train_outcome_models_eval_test.sh
+            * (Used in both original hyperparameters and end to end analysis pipelines)
+            * Loads hyperparameters.json and best_models.json generated in train_outcome_models_validation/results (in end to end case) or in models/replication_hyperparameters (in original hyperparameters case)
+            * Constructs train/validation predictions to be saved as "test_predictions.csv" in results
+
+# results folders
+
+* experiment_results
+    * train_outcome_models
+    * train_outcome_models_eval_test
+    * train_outcome_models_eval_test_rep
+    * train_outcome_models_validation
+* thresholding
+    * thresholding_eval_test
+    * thresholding_validation
+
+# scripts folder
+
+* scripts
+    * eval_test_scripts
+        * train_outcome_models_eval_test_replication.sh
+            * Runs experiment_train_outcome_models.py using best_models.json, hyperparameters.json
+            * This is the only script run in pipeline #1 using optimal hyperparameters
+        * thresholding_test.sh
+            * Runs experiment_thresholding.py, as name 'thresholding_eval_test'
+            * --eval_test, --save_policy = True
+            * Creates best_test_outcomes_by_max_broad.csv, test_policy_df.csv
+        * train_outcome_models_eval_test.sh
+            * Runs experiment_train_outcome_models.py using best_models.json, hyperparameters.json from train_outcome_models_validation.sh
+    * validation_scripts
+        * train_outcome_models_validation.sh
+            * Runs experiment_train_outcome_models.py as name "train_outcome_models_validation"
+        * thresholding_validation.sh
+            * Runs experiment_thresholding.py, as name "thresholding_validation"
+            * Creates best_val_outcomes_by_max_broad.csv, val_stats_by_setting.csv
