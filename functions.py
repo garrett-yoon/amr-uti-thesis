@@ -80,8 +80,8 @@ def get_iat_broad(policy_df, col_name):
     return iat, broad
 
 
-def make_fig_fold():
-    t = datetime.now().strftime("%d-%m-%Y_%H-%M-%S")
+def make_fig_fold(suffix=''):
+    t = datetime.now().strftime("%d-%m-%Y_%H-%M-%S") + suffix
     os.mkdir(t)
     return t
 
